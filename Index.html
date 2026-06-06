@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Golf Tracker">
+<meta name="theme-color" content="#ffffff">
+<title>Golf Tracker</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; color: #1a1a1a; padding: 0 0 env(safe-area-inset-bottom) 0; }
+.app { max-width: 520px; margin: 0 auto; padding: 16px 14px 40px; }
+h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 4px; }
+.sub { font-size: 12px; color: #888; text-align: center; margin-bottom: 16px; }
+
+.section-label { font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; margin-top: 14px; }
+
+.seq-display { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #888; min-height: 42px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+.pill { background: #f0f0f0; border-radius: 20px; padding: 2px 9px; font-size: 11px; color: #333; }
+.pill.penalty { background: #fff0f0; color: #c0392b; }
+.arrow { color: #ccc; font-size: 10px; }
+
+.panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+.panel-title { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 12px; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 20px; background: #f7f7f7; color: #555; cursor: pointer; user-select: none; transition: all 0.12s; }
+.chip.sel { background: #e8f0fe; border-color: #4a7eff; color: #1a56cc; font-weight: 600; }
+.chip.sel-danger { background: #fff0f0; border-color: #e57373; color: #c0392b; font-weight: 600; }
+.chip.sel-success { background: #edfbf3; border-color: #4caf7d; color: #1e7a4a; font-weight: 600; }
+.chip.sel-warn { background: #fff8e1; border-color: #f5a623; color: #9a6000; font-weight: 600; }
+
+.commit-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: 10px; background: #1e7a4a; color: #fff; cursor: pointer; margin-top: 10px; }
+.commit-btn:disabled { background: #ccc; cursor: not-allowed; }
+.hole-btn { width: 100%; padding: 12px; font-size: 13px; font-weight: 600; border: 1px solid #1e7a4a; border-radius: 10px; background: #fff; color: #1e7a4a; cursor: pointer; margin-top: 8px; }
+.action-row { display: flex; gap: 8px; margin-top: 8px; }
+.action-btn { flex: 1; padding: 10px; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 10px; background: #fff; color: #666; cursor: pointer; }
+.action-btn.danger { border-color: #e57373; color: #c0392b; }
+
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.stat-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 10px 8px; text-align: center; }
+.stat-label { font-size: 10px; color: #999; margin-bottom: 3px; }
+.stat-value { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+
+.tabs { display: flex; gap: 0; margin-bottom: 12px; background: #f0f0f0; border-radius: 10px; padding: 3px; }
+.tab { flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500; cursor: pointer; color: #888; border-radius: 8px; text-align: center; transition: all 0.15s; }
+.tab.active { background: #fff; color: #1a1a1a; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.matrix-wrap { overflow-x: auto; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; font-size: 10px; min-width: 100%; }
+th, td { padding: 6px 5px; border: 1px solid #eee; text-align: center; white-space: nowrap; color: #1a1a1a; }
+th { background: #f7f7f7; font-weight: 600; font-size: 10px; color: #666; }
+td.row-lbl { font-weight: 600; background: #f7f7f7; color: #555; text-align: left; padding-left: 8px; }
+td.hi { background: #edfbf3; color: #1e7a4a; font-weight: 600; }
+td.mi { background: #e8f0fe; color: #1a56cc; }
+
+.filter-label { font-size: 11px; color: #888; margin: 10px 0 6px; }
+.insight-list { display: flex; flex-direction: column; gap: 8px; }
+.insight { background: #f7f9ff; border: 1px solid #e0e8ff; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #444; line-height: 1.5; }
+.insight strong { color: #1a1a1a; }
+
+.history-list { max-height: 200px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.history-item { font-size: 11px; color: #666; padding: 7px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.history-item:last-child { border-bottom: none; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #f0f0f0; color: #666; white-space: nowrap; }
+.err { font-size: 12px; color: #c0392b; margin-bottom: 8px; background: #fff0f0; border-radius: 8px; padding: 8px 12px; display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>⛳ Golf Tracker</h1>
+  <p class="sub">Markov chain shot strategizer</p>
+
+  <div class="seq-display" id="seq"><span style="color:#bbb;font-size:12px">Log a shot to begin</span></div>
+  <div class="err" id="err"></div>
+
+  <div class="panel">
+    <div class="panel-title">1. Location landed</div>
+    <div class="chip-row">
+      <span class="chip" data-v="Tee box" onclick="selectChip('loc',this)">Tee box</span>
+      <span class="chip" data-v="Fairway" onclick="selectChip('loc',this)">Fairway</span>
+      <span class="chip" data-v="Rough" onclick="selectChip('loc',this)">Rough</span>
+      <span class="chip" data-v="Bunker" onclick="selectChip('loc',this)">Bunker</span>
+      <span class="chip" data-v="Green" onclick="selectChip('loc',this)">Green</span>
+      <span class="chip" data-v="Water" onclick="selectChip('loc',this)">Water</span>
+    </div>
+  </div>
+
+  <div class="panel" id="detail-panel" style="opacity:0.4;pointer-events:none">
+    <div class="panel-title">2. Shot details</div>
+
+    <div class="section-label" style="margin-top:0">Club used</div>
+    <div class="chip-row">
+      <span class="chip" data-v="Driver" onclick="selectChip('club',this)">Driver</span>
+      <span class="chip" data-v="3W" onclick="selectChip('club',this)">3W</span>
+      <span class="chip" data-v="5W/Hybrid" onclick="selectChip('club',this)">5W/Hybrid</span>
+      <span class="chip" data-v="Long iron" onclick="selectChip('club',this)">Long iron</span>
+      <span class="chip" data-v="Mid iron" onclick="selectChip('club',this)">Mid iron</span>
+      <span class="chip" data-v="Short iron" onclick="selectChip('club',this)">Short iron</span>
+      <span class="chip" data-v="Wedge" onclick="selectChip('club',this)">Wedge</span>
+      <span class="chip" data-v="Putter" onclick="selectChip('club',this)">Putter</span>
+    </div>
+
+    <div class="section-label">Distance to hole (before shot)</div>
+    <div class="chip-row">
+      <span class="chip" data-v="<50y" onclick="selectChip('dist',this)">&lt;50y</span>
+      <span class="chip" data-v="50–100y" onclick="selectChip('dist',this)">50–100y</span>
+      <span class="chip" data-v="100–150y" onclick="selectChip('dist',this)">100–150y</span>
+      <span class="chip" data-v="150–200y" onclick="selectChip('dist',this)">150–200y</span>
+      <span class="chip" data-v="200y+" onclick="selectChip('dist',this)">200y+</span>
+    </div>
+
+    <div class="section-label">Shot quality</div>
+    <div class="chip-row">
+      <span class="chip" data-v="Good" onclick="selectChip('qual',this)">Good</span>
+      <span class="chip" data-v="OK" onclick="selectChip('qual',this)">OK</span>
+      <span class="chip" data-v="Mishit" onclick="selectChip('qual',this)">Mishit</span>
+    </div>
+
+    <div class="section-label">Lie quality</div>
+    <div class="chip-row">
+      <span class="chip" data-v="Clean" onclick="selectChip('lie',this)">Clean</span>
+      <span class="chip" data-v="Tight" onclick="selectChip('lie',this)">Tight</span>
+      <span class="chip" data-v="Awkward" onclick="selectChip('lie',this)">Awkward</span>
+      <span class="chip" data-v="Buried" onclick="selectChip('lie',this)">Buried</span>
+    </div>
+
+    <div class="section-label">Penalty stroke?</div>
+    <div class="chip-row">
+      <span class="chip" data-v="No" onclick="selectChip('pen',this)">No</span>
+      <span class="chip" data-v="Yes" onclick="selectChip('pen',this)">Yes (+1 stroke)</span>
+    </div>
+  </div>
+
+  <button class="commit-btn" id="commit-btn" onclick="commitShot()" disabled>Add shot</button>
+  <button class="hole-btn" onclick="endHole()">✓ Holed out — save hole</button>
+  <div class="action-row">
+    <button class="action-btn" onclick="undoShot()">↩ Undo</button>
+    <button class="action-btn" onclick="clearHole()">✕ Clear hole</button>
+    <button class="action-btn danger" onclick="clearAll()">⌫ Reset all</button>
+  </div>
+
+  <div class="section-label">Summary</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Holes</div><div class="stat-value" id="s-holes">0</div></div>
+    <div class="stat-card"><div class="stat-label">Avg shots</div><div class="stat-value" id="s-avg">—</div></div>
+    <div class="stat-card"><div class="stat-label">Penalties</div><div class="stat-value" id="s-pen">0</div></div>
+    <div class="stat-card"><div class="stat-label">Mishit %</div><div class="stat-value" id="s-mis">—</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('matrix',this)">Matrix</div>
+    <div class="tab" onclick="switchTab('insights',this)">Insights</div>
+    <div class="tab" onclick="switchTab('history',this)">History</div>
+  </div>
+
+  <div class="tab-panel active" id="tab-matrix">
+    <div class="matrix-wrap"><table id="matrix"></table></div>
+    <div class="filter-label">Filter by club:</div>
+    <div class="chip-row" id="filter-chips" style="margin-bottom:14px">
+      <span class="chip sel" data-v="All" onclick="selectFilter(this)">All</span>
+      <span class="chip" data-v="Driver" onclick="selectFilter(this)">Driver</span>
+      <span class="chip" data-v="3W" onclick="selectFilter(this)">3W</span>
+      <span class="chip" data-v="5W/Hybrid" onclick="selectFilter(this)">5W/Hybrid</span>
+      <span class="chip" data-v="Long iron" onclick="selectFilter(this)">Long iron</span>
+      <span class="chip" data-v="Mid iron" onclick="selectFilter(this)">Mid iron</span>
+      <span class="chip" data-v="Short iron" onclick="selectFilter(this)">Short iron</span>
+      <span class="chip" data-v="Wedge" onclick="selectFilter(this)">Wedge</span>
+      <span class="chip" data-v="Putter" onclick="selectFilter(this)">Putter</span>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-insights">
+    <div class="insight-list" id="insights"><div class="insight">Log a few holes to generate strategy insights.</div></div>
+  </div>
+
+  <div class="tab-panel" id="tab-history">
+    <div class="history-list" id="history"><span style="font-size:12px;color:#bbb">No holes logged yet</span></div>
+  </div>
+</div>
+
+<script>
+const LOCS = ['Tee box','Fairway','Rough','Bunker','Green','Water','Hole'];
+let sel = {};
+let seq = [];
+let holes = JSON.parse(localStorage.getItem('golfMarkovV2') || '[]');
+let filterClub = 'All';
+
+function selectChip(group, el) {
+  const row = el.parentElement;
+  row.querySelectorAll('.chip').forEach(c => c.className = 'chip');
+  sel[group] = el.dataset.v;
+  const cls = group === 'pen' && el.dataset.v === 'Yes' ? 'chip sel-danger'
+    : group === 'qual' && el.dataset.v === 'Mishit' ? 'chip sel-danger'
+    : group === 'qual' && el.dataset.v === 'Good' ? 'chip sel-success'
+    : group === 'lie' && el.dataset.v === 'Buried' ? 'chip sel-warn'
+    : 'chip sel';
+  el.className = cls;
+  if (sel.loc) {
+    document.getElementById('detail-panel').style.opacity = '1';
+    document.getElementById('detail-panel').style.pointerEvents = 'auto';
+  }
+  updateCommitBtn();
+}
+
+function updateCommitBtn() {
+  document.getElementById('commit-btn').disabled = !(sel.loc && sel.club && sel.dist && sel.qual && sel.lie && sel.pen);
+}
+
+function commitShot() {
+  if (!sel.loc || !sel.club || !sel.dist || !sel.qual || !sel.lie || !sel.pen) return;
+  if (seq.length === 0 && sel.loc !== 'Tee box') { showErr('First shot must be from the tee box.'); return; }
+  seq.push({ loc: sel.loc, club: sel.club, dist: sel.dist, qual: sel.qual, lie: sel.lie, pen: sel.pen === 'Yes' });
+  sel = {};
+  document.querySelectorAll('.panel .chip, .panel .chip.sel, .panel .chip.sel-danger, .panel .chip.sel-success, .panel .chip.sel-warn').forEach(c => c.className = 'chip');
+  document.getElementById('detail-panel').style.opacity = '0.4';
+  document.getElementById('detail-panel').style.pointerEvents = 'none';
+  document.getElementById('commit-btn').disabled = true;
+  renderSeq();
+}
+
+function endHole() {
+  if (seq.length === 0) { showErr('Log at least one shot first.'); return; }
+  if (seq[0].loc !== 'Tee box') { showErr('Hole must start from tee box.'); return; }
+  holes.push([...seq, { loc: 'Hole', club: '—', dist: '0', qual: '—', lie: '—', pen: false }]);
+  save(); seq = []; sel = {};
+  document.querySelectorAll('.panel .chip').forEach(c => c.className = 'chip');
+  document.getElementById('detail-panel').style.opacity = '0.4';
+  document.getElementById('detail-panel').style.pointerEvents = 'none';
+  document.getElementById('commit-btn').disabled = true;
+  render();
+}
+
+function undoShot() { if (seq.length) { seq.pop(); renderSeq(); } }
+
+function clearHole() {
+  seq = []; sel = {};
+  document.querySelectorAll('.panel .chip').forEach(c => c.className = 'chip');
+  document.getElementById('detail-panel').style.opacity = '0.4';
+  document.getElementById('detail-panel').style.pointerEvents = 'none';
+  document.getElementById('commit-btn').disabled = true;
+  renderSeq();
+}
+
+function clearAll() {
+  if (!confirm('Delete all logged data?')) return;
+  holes = []; localStorage.removeItem('golfMarkovV2'); clearHole(); render();
+}
+
+function save() { localStorage.setItem('golfMarkovV2', JSON.stringify(holes)); }
+
+function showErr(m) {
+  const e = document.getElementById('err');
+  e.textContent = m; e.style.display = 'block';
+  setTimeout(() => e.style.display = 'none', 2500);
+}
+
+function renderSeq() {
+  const el = document.getElementById('seq');
+  if (!seq.length) { el.innerHTML = '<span style="color:#bbb;font-size:12px">Log a shot to begin</span>'; return; }
+  el.innerHTML = seq.map((s, i) =>
+    (i > 0 ? '<span class="arrow">›</span>' : '') +
+    `<span class="pill">${s.loc}</span><span style="font-size:10px;color:#aaa;padding:0 2px">${s.club}</span>` +
+    (s.pen ? '<span class="pill penalty">+1</span>' : '')
+  ).join('');
+}
+
+function render() { renderSeq(); renderStats(); renderMatrix(); renderInsights(); renderHistory(); }
+
+function renderStats() {
+  document.getElementById('s-holes').textContent = holes.length;
+  if (!holes.length) { ['s-avg','s-mis'].forEach(id => document.getElementById(id).textContent = '—'); document.getElementById('s-pen').textContent = 0; return; }
+  let shots = 0, pen = 0, mis = 0, qual = 0;
+  holes.forEach(h => { shots += h.length - 1; h.forEach(s => { if (s.pen) pen++; if (s.qual === 'Mishit') mis++; if (s.qual && s.qual !== '—') qual++; }); });
+  document.getElementById('s-avg').textContent = (shots / holes.length).toFixed(1);
+  document.getElementById('s-pen').textContent = pen;
+  document.getElementById('s-mis').textContent = qual > 0 ? Math.round((mis / qual) * 100) + '%' : '—';
+}
+
+function selectFilter(el) {
+  document.querySelectorAll('#filter-chips .chip').forEach(c => c.className = 'chip');
+  el.className = 'chip sel'; filterClub = el.dataset.v; renderMatrix();
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function renderMatrix() {
+  const n = LOCS.length;
+  const counts = Array.from({length: n}, () => Array(n).fill(0));
+  holes.forEach(h => {
+    for (let i = 0; i < h.length - 1; i++) {
+      if (filterClub !== 'All' && h[i].club !== filterClub) continue;
+      const f = LOCS.indexOf(h[i].loc), t = LOCS.indexOf(h[i+1].loc);
+      if (f >= 0 && t >= 0) counts[f][t]++;
+    }
+  });
+  let html = '<tr><th style="text-align:left;min-width:56px">From\To</th>' + LOCS.map(s => `<th>${s}</th>`).join('') + '</tr>';
+  counts.forEach((row, i) => {
+    const sum = row.reduce((a, b) => a + b, 0);
+    html += `<tr><td class="row-lbl">${LOCS[i]}</td>`;
+    row.forEach(c => {
+      const pct = sum > 0 ? Math.round((c / sum) * 100) : 0;
+      html += `<td class="${pct >= 60 ? 'hi' : pct >= 30 ? 'mi' : ''}">${pct > 0 ? pct + '%' : '—'}</td>`;
+    });
+    html += '</tr>';
+  });
+  document.getElementById('matrix').innerHTML = html;
+}
+
+function renderInsights() {
+  const el = document.getElementById('insights');
+  if (holes.length < 2) { el.innerHTML = '<div class="insight">Log a few holes to generate strategy insights.</div>'; return; }
+  const insights = [];
+
+  const clubFW = {};
+  holes.forEach(h => h.forEach((s, i) => {
+    if (s.loc === 'Tee box' && h[i+1]) {
+      if (!clubFW[s.club]) clubFW[s.club] = { fw: 0, total: 0 };
+      clubFW[s.club].total++;
+      if (h[i+1].loc === 'Fairway') clubFW[s.club].fw++;
+    }
+  }));
+  let bestClub = null, bestRate = -1;
+  Object.entries(clubFW).forEach(([club, d]) => { if (d.total >= 2 && d.fw/d.total > bestRate) { bestRate = d.fw/d.total; bestClub = club; } });
+  if (bestClub) insights.push(`<strong>${bestClub}</strong> gives you the best fairway rate off the tee (${Math.round(bestRate*100)}%).`);
+
+  const qd = { Good: {}, Mishit: {} };
+  holes.forEach(h => { for (let i = 0; i < h.length-1; i++) { const q = h[i].qual, next = h[i+1].loc; if (q==='Good'||q==='Mishit') qd[q][next]=(qd[q][next]||0)+1; } });
+  const gt = Object.values(qd.Good).reduce((a,b)=>a+b,0), mt = Object.values(qd.Mishit).reduce((a,b)=>a+b,0);
+  if (gt>0&&mt>0) insights.push(`Good strikes find the green <strong>${Math.round(((qd.Good.Green||0)/gt)*100)}%</strong> of the time vs <strong>${Math.round(((qd.Mishit.Green||0)/mt)*100)}%</strong> on mishits.`);
+
+  const lieR = {};
+  holes.forEach(h => { for (let i=0;i<h.length-1;i++) { const lie=h[i].lie,next=h[i+1].loc; if(!lie||lie==='—') continue; if(!lieR[lie]) lieR[lie]={tr:0,tot:0}; lieR[lie].tot++; if(next==='Rough'||next==='Bunker'||next==='Water') lieR[lie].tr++; } });
+  let worstLie=null,worstR=-1;
+  Object.entries(lieR).forEach(([lie,d])=>{ if(d.tot>=2&&d.tr/d.tot>worstR){worstR=d.tr/d.tot;worstLie=lie;} });
+  if(worstLie) insights.push(`Shots from a <strong>${worstLie.toLowerCase()}</strong> lie find trouble ${Math.round(worstR*100)}% of the time — consider punching out.`);
+
+  const dH = {};
+  holes.forEach(h=>{ for(let i=0;i<h.length-1;i++){ const dist=h[i].dist,next=h[i+1].loc; if(!dist||dist==='0') continue; if(!dH[dist]) dH[dist]={g:0,tot:0}; dH[dist].tot++; if(next==='Green'||next==='Hole') dH[dist].g++; } });
+  let bestDist=null,bestGIR=-1;
+  Object.entries(dH).forEach(([dist,d])=>{ if(d.tot>=2&&d.g/d.tot>bestGIR){bestGIR=d.g/d.tot;bestDist=dist;} });
+  if(bestDist) insights.push(`Your most reliable approach distance is <strong>${bestDist}</strong> — you find the green ${Math.round(bestGIR*100)}% of the time.`);
+
+  let penTotal=0;
+  holes.forEach(h=>h.forEach(s=>{if(s.pen)penTotal++;}));
+  if(penTotal>0) insights.push(`You've taken <strong>${penTotal} penalty stroke${penTotal>1?'s':''}</strong> across ${holes.length} holes (${(penTotal/holes.length).toFixed(1)} per hole).`);
+
+  el.innerHTML = insights.length ? insights.map(t=>`<div class="insight">${t}</div>`).join('') : '<div class="insight">Keep logging holes — more data means better insights.</div>';
+}
+
+function renderHistory() {
+  const el = document.getElementById('history');
+  if (!holes.length) { el.innerHTML = '<span style="font-size:12px;color:#bbb">No holes logged yet</span>'; return; }
+  el.innerHTML = [...holes].reverse().map((h, i) => {
+    const shots = h.length-1, pens = h.filter(s=>s.pen).length, num = holes.length-i;
+    return `<div class="history-item"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${num}. ${h.map(s=>s.loc).join(' › ')}</span><span class="badge">${shots} shots${pens?', +'+pens+' pen':''}</span></div>`;
+  }).join('');
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+render();
+</script>
+</body>
+</html>
