@@ -13,7 +13,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; color: #1a1a1a; padding: 0 0 env(safe-area-inset-bottom) 0; }
 .app { max-width: 520px; margin: 0 auto; padding: 16px 14px 0; padding-bottom: 0; }
-/* Fixed bottom input bar */
 .input-bar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e0e0e0; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); z-index: 50; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
 .input-bar-inner { max-width: 520px; margin: 0 auto; }
 .step-dots { display: flex; justify-content: center; gap: 5px; margin-bottom: 8px; }
@@ -27,11 +26,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .input-bar-actions .commit-btn,
 .input-bar-actions .hole-btn { margin-top: 0; flex: 1; }
 .input-bar-back { padding: 0 10px; font-size: 12px; color: #888; background: none; border: none; cursor: pointer; flex-shrink: 0; }
-.spacer-for-input-bar { height: 0; } /* height set dynamically via JS to match real bar height */
+.spacer-for-input-bar { height: 0; }
 h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 4px; }
 .sub { font-size: 12px; color: #888; text-align: center; margin-bottom: 16px; }
 .section-label { font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; margin-top: 14px; }
-/* Round banner */
 .round-banner { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 .round-banner.active { border-color: #1e7a4a; background: #f6fdf9; }
 .round-info { font-size: 13px; color: #1a1a1a; font-weight: 500; }
@@ -67,7 +65,6 @@ h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; text-align: center; marg
 .tab.active { background: #fff; color: #1a1a1a; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-/* scope toggle */
 .scope-row { display: flex; gap: 6px; margin-bottom: 10px; }
 .scope-btn { flex: 1; padding: 8px; font-size: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f7f7f7; color: #666; cursor: pointer; text-align: center; }
 .scope-btn.active { background: #1e7a4a; border-color: #1e7a4a; color: #fff; font-weight: 600; }
@@ -88,7 +85,6 @@ td.mi { background: #e8f0fe; color: #1a56cc; }
 .insight-list { display: flex; flex-direction: column; gap: 8px; }
 .insight { background: #f7f9ff; border: 1px solid #e0e8ff; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #444; line-height: 1.5; }
 .insight strong { color: #1a1a1a; }
-/* Rounds history */
 .round-item { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
 .round-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .round-date { font-size: 13px; font-weight: 600; color: #1a1a1a; }
@@ -99,7 +95,6 @@ td.mi { background: #e8f0fe; color: #1a56cc; }
 .hole-line { padding: 2px 0; border-bottom: 1px solid #f5f5f5; }
 .hole-line:last-child { border-bottom: none; }
 .err { font-size: 12px; color: #c0392b; margin-bottom: 8px; background: #fff0f0; border-radius: 8px; padding: 8px 12px; display: none; }
-/* Strokes-to-hole cards */
 .strokes-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
 .strokes-card.low-confidence { background: #fafafa; border-style: dashed; }
 .strokes-card-top { display: flex; justify-content: space-between; align-items: baseline; }
@@ -114,9 +109,8 @@ td.mi { background: #e8f0fe; color: #1a56cc; }
 </head>
 <body>
 <div class="app">
-<h1>⛳ Golf Tracker</h1>
+<h1>&#9971; Golf Tracker</h1>
 <p class="sub">Markov chain shot strategizer</p>
-<!-- Round banner -->
 <div class="round-banner" id="round-banner">
 <div>
 <div class="round-info" id="round-info">No active round</div>
@@ -140,7 +134,6 @@ td.mi { background: #e8f0fe; color: #1a56cc; }
 <div class="tab" onclick="switchTab('insights',this)">Insights</div>
 <div class="tab" onclick="switchTab('rounds',this)">Rounds</div>
 </div>
-<!-- Matrix tab -->
 <div class="tab-panel active" id="tab-matrix">
 <div class="scope-row">
 <button class="scope-btn active" id="scope-all" onclick="setScope('all',this)">All time</button>
@@ -160,7 +153,6 @@ td.mi { background: #e8f0fe; color: #1a56cc; }
 <span class="chip" data-v="Putter" onclick="selectFilter(this)">Putter</span>
 </div>
 </div>
-<!-- Strokes tab — expected strokes to hole from each location -->
 <div class="tab-panel" id="tab-strokes">
 <div class="scope-row">
 <button class="scope-btn active" id="sscope-all" onclick="setStrokesScope('all',this)">All time</button>
@@ -171,7 +163,6 @@ Expected shots remaining to hole out from each location, based on your own trans
 </p>
 <div id="strokes-list"></div>
 </div>
-<!-- Putting tab -->
 <div class="tab-panel" id="tab-putting">
 <div class="scope-row">
 <button class="scope-btn active" id="pscope-all" onclick="setPuttScope('all',this)">All time</button>
@@ -190,25 +181,18 @@ Expected shots remaining to hole out from each location, based on your own trans
 </table>
 </div>
 </div>
-<!-- Insights tab -->
 <div class="tab-panel" id="tab-insights">
 <div class="insight-list" id="insights"><div class="insight">Log a few holes to generate strategy insights.</div></div>
 </div>
-<!-- Rounds tab -->
 <div class="tab-panel" id="tab-rounds">
 <div id="rounds-list"><span style="font-size:12px;color:#bbb">No rounds completed yet.</span></div>
 </div>
 <div class="spacer-for-input-bar" id="bottom-spacer"></div>
 </div>
-<!-- Fixed bottom input bar: shows exactly one step at a time so it stays
-     thumb-reachable. Mirrors the same sel/seq/puttingMode state and the
-     same selectLoc/selectChip/commitShot functions used before — only the
-     markup position and the one-step-at-a-time reveal logic are new. -->
 <div class="input-bar" id="input-bar">
 <div class="input-bar-inner">
 <div class="step-dots" id="step-dots"></div>
 <div class="step-title" id="step-title">Where did it land?</div>
-<!-- Location step -->
 <div class="step-chip-row" id="step-loc" data-step="loc">
 <span class="chip" data-v="Tee box" onclick="selectLoc(this)">Tee box</span>
 <span class="chip" data-v="Fairway" onclick="selectLoc(this)">Fairway</span>
@@ -217,7 +201,6 @@ Expected shots remaining to hole out from each location, based on your own trans
 <span class="chip" data-v="Green" onclick="selectLoc(this)">Green</span>
 <span class="chip" data-v="Water" onclick="selectLoc(this)">Water</span>
 </div>
-<!-- Normal shot detail steps — one row visible at a time via .active -->
 <div class="step-chip-row" id="step-club" data-step="club" style="display:none">
 <span class="chip" data-v="Driver" onclick="selectChip('club',this)">Driver</span>
 <span class="chip" data-v="3W" onclick="selectChip('club',this)">3W</span>
@@ -249,7 +232,6 @@ Expected shots remaining to hole out from each location, based on your own trans
 <span class="chip" data-v="No" onclick="selectChip('pen',this)">No</span>
 <span class="chip" data-v="Yes" onclick="selectChip('pen',this)">Yes (+1)</span>
 </div>
-<!-- Putting steps -->
 <div class="step-chip-row" id="step-puttDist" data-step="puttDist" style="display:none">
 <span class="chip" data-v="Tap-in" onclick="selectChip('puttDist',this)">Tap-in (&lt;2ft)</span>
 <span class="chip" data-v="Short" onclick="selectChip('puttDist',this)">Short (3-6ft)</span>
@@ -269,10 +251,10 @@ Expected shots remaining to hole out from each location, based on your own trans
 <span class="chip" data-v="3-putt zone" onclick="selectChip('puttResult',this)">3-putt zone</span>
 </div>
 <div class="input-bar-actions">
-<button class="input-bar-back" id="step-back-btn" onclick="stepBack()" style="visibility:hidden">‹ Back</button>
-<button class="hole-btn" id="hole-btn-fixed" onclick="endHole()" style="display:none">✓ Holed out - save hole</button>
-<button class="action-btn" onclick="undoShot()">↩ Undo</button>
-<button class="action-btn danger" onclick="clearAll()">🗑</button>
+<button class="input-bar-back" id="step-back-btn" onclick="stepBack()" style="visibility:hidden">&#8249; Back</button>
+<button class="hole-btn" id="hole-btn-fixed" onclick="endHole()" style="display:none">&#10003; Holed out - save hole</button>
+<button class="action-btn" onclick="undoShot()">&#8617; Undo</button>
+<button class="action-btn danger" onclick="clearAll()">&#128465;</button>
 </div>
 </div>
 </div>
@@ -283,8 +265,6 @@ const PUTT_DISTS = ['Tap-in','Short','Mid','Long'];
 const BREAKS = ['Straight','Slight break','Big break'];
 let sel = {}, seq = [], puttingMode = false;
 let filterClub = 'All', matrixScope = 'all', puttScope = 'all';
-// Data model: rounds = [{id, startedAt, endedAt, holes:[...]}]
-// currentRound = {id, startedAt, holes:[...]} | null
 let rounds = JSON.parse(localStorage.getItem('golfRounds') || '[]');
 let currentRound = JSON.parse(localStorage.getItem('golfCurrentRound') || 'null');
 function save() {
@@ -300,7 +280,6 @@ function scopeHoles(scope) {
 if (scope === 'round') return currentRound ? currentRound.holes : [];
 return allHoles();
 }
-// Round management
 function toggleRound() {
 if (currentRound) {
 endRound();
@@ -347,10 +326,6 @@ btn.textContent = 'Start round';
 btn.className = 'start-round-btn';
 }
 }
-// Shot logging
-// Step sequences: which chip-row to show, in order, for each mode.
-// 'loc' is always first and lives outside these arrays since it's what
-// decides which sequence to use.
 const NORMAL_STEPS = ['club', 'dist', 'qual', 'lie', 'pen'];
 const PUTT_STEPS = ['puttDist', 'break', 'puttResult'];
 const STEP_TITLES = {
@@ -364,29 +339,21 @@ puttDist: 'Putt distance?',
 break: 'Green reading?',
 puttResult: 'Putt result?'
 };
-let currentStepIndex = 0; // 0 = location step; 1+ = index into the active steps array
+let currentStepIndex = 0;
 function activeSteps() {
 return puttingMode ? PUTT_STEPS : NORMAL_STEPS;
 }
-// Shows exactly one step's chip row in the fixed bottom bar and hides all
-// others, so the input never grows taller than one row + dots + buttons —
-// that's the whole point of moving this here, so it stays thumb-reachable
-// without scrolling, even though there are up to 6 fields to fill in.
 function showStep(stepName) {
 document.querySelectorAll('.step-chip-row').forEach(row => {
 row.style.display = row.dataset.step === stepName ? 'flex' : 'none';
 });
 document.getElementById('step-title').textContent = STEP_TITLES[stepName] || '';
-// The first shot of a hole is always the tee box — there's no valid
-// alternative in golf — so the floor for "how far back can Back go"
-// is 1 instead of 0 in that case: it can return to club selection,
-// but never back into a choice of location.
 const floor = seq.length === 0 ? 1 : 0;
 document.getElementById('step-back-btn').style.visibility = currentStepIndex > floor ? 'visible' : 'hidden';
 renderStepDots();
 }
 function renderStepDots() {
-const total = activeSteps().length + 1; // +1 for the location step itself
+const total = activeSteps().length + 1;
 const dotsEl = document.getElementById('step-dots');
 let html = '';
 for (let i = 0; i < total; i++) {
@@ -395,13 +362,35 @@ html += '<span class="' + cls + '"></span>';
 }
 dotsEl.innerHTML = html;
 }
+function gpsDistanceYards(p1, p2) {
+if (!p1 || !p2) return null;
+const R = 6371000;
+const toRad = deg => deg * Math.PI / 180;
+const dLat = toRad(p2.lat - p1.lat);
+const dLng = toRad(p2.lng - p1.lng);
+const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(p1.lat)) * Math.cos(toRad(p2.lat)) * Math.sin(dLng / 2) ** 2;
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+return R * c * 1.09361;
+}
+function captureGPS() {
+return new Promise((resolve) => {
+if (!navigator.geolocation) { resolve(null); return; }
+navigator.geolocation.getCurrentPosition(
+pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+err => { console.warn('GPS unavailable:', err.message); resolve(null); },
+{ enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+);
+});
+}
 function selectLoc(el) {
 document.querySelectorAll('#step-loc .chip').forEach(c => c.className = 'chip');
 el.className = 'chip sel';
 sel = { loc: el.dataset.v };
+const thisSel = sel;
 puttingMode = sel.loc === 'Green';
 currentStepIndex = 1;
 showStep(activeSteps()[0]);
+captureGPS().then(gps => { if (gps) thisSel.gps = gps; });
 }
 function selectChip(group, el) {
 el.parentElement.querySelectorAll('.chip').forEach(c => c.className = 'chip');
@@ -424,8 +413,6 @@ showStep(steps[currentStepIndex - 1]);
 }
 }
 function stepBack() {
-// Can't back below "club" on the first shot of a hole — the location
-// is locked to Tee box and was never actually a choice on this shot.
 const floor = seq.length === 0 ? 1 : 0;
 if (currentStepIndex <= floor) return;
 currentStepIndex--;
@@ -439,14 +426,14 @@ return;
 }
 let shot;
 if (puttingMode) {
-shot = { loc: sel.loc, club: 'Putter', dist: sel.puttDist, qual: sel.puttResult, lie: 'Clean', pen: false, puttDist: sel.puttDist, break: sel.break, puttResult: sel.puttResult, isPutt: true };
+shot = { loc: sel.loc, club: 'Putter', dist: sel.puttDist, qual: sel.puttResult, lie: 'Clean', pen: false, puttDist: sel.puttDist, break: sel.break, puttResult: sel.puttResult, isPutt: true, gps: sel.gps || null };
 if (sel.puttResult === 'Holed') {
 seq.push(shot);
 saveHole();
 resetInputs(); render(); return;
 }
 } else {
-shot = { loc: sel.loc, club: sel.club, dist: sel.dist, qual: sel.qual, lie: sel.lie, pen: sel.pen === 'Yes' };
+shot = { loc: sel.loc, club: sel.club, dist: sel.dist, qual: sel.qual, lie: sel.lie, pen: sel.pen === 'Yes', gps: sel.gps || null };
 }
 seq.push(shot);
 resetInputs(); renderSeq();
@@ -491,13 +478,11 @@ resetInputs(); render(); renderRoundBanner();
 }
 function resetInputs() {
 sel = {}; puttingMode = false;
-// The first shot of every hole is always from the tee box — golf rules
-// don't allow starting a hole anywhere else — so skip asking and jump
-// straight to club selection instead of risking a wrong tap or a late
-// validation error after filling in four other fields.
 if (seq.length === 0) {
 sel = { loc: 'Tee box' };
+const thisSel = sel;
 currentStepIndex = 1;
+captureGPS().then(gps => { if (gps) thisSel.gps = gps; });
 } else {
 currentStepIndex = 0;
 }
@@ -509,12 +494,18 @@ function showErr(m) { const e = document.getElementById('err'); e.textContent = 
 function renderSeq() {
 const el = document.getElementById('seq');
 if (!seq.length) { el.innerHTML = '<span style="color:#bbb;font-size:12px">Log a shot to begin</span>'; return; }
-el.innerHTML = seq.map((s, i) =>
-(i > 0 ? '<span class="arrow">></span>' : '') +
+el.innerHTML = seq.map((s, i) => {
+let distLabel = '';
+if (i > 0 && seq[i-1].gps && s.gps) {
+const yards = gpsDistanceYards(seq[i-1].gps, s.gps);
+if (yards !== null) distLabel = '<span style="font-size:10px;color:#1e7a4a;padding:0 2px">' + Math.round(yards) + 'y</span>';
+}
+return (i > 0 ? '<span class="arrow">></span>' : '') +
 '<span class="pill">' + s.loc + '</span>' +
 '<span style="font-size:10px;color:#aaa;padding:0 2px">' + (s.isPutt ? s.puttDist : s.club) + '</span>' +
-(s.pen ? '<span class="pill penalty">+1</span>' : '')
-).join('');
+distLabel +
+(s.pen ? '<span class="pill penalty">+1</span>' : '');
+}).join('');
 }
 function render() { renderSeq(); renderStats(); renderMatrix(); renderStrokes(); renderPutting(); renderInsights(); renderRounds(); }
 function renderStats() {
